@@ -1,0 +1,12 @@
+
+
+J'ai réalisé une application en utilisant le modèle de couches avec les composants suivants :
+
+*Modèle (model)
+*Répository (repository)
+*Service
+*Contrôleur (controller)
+*DTO (Data Transfer Object)
+*Exception et handlers
+
+J'ai utilisé Spring Data JPA pour faciliter la gestion de la persistance des données.
