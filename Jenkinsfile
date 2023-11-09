@@ -13,26 +13,18 @@ node {
                 branch: 'master'
         }
 
-        stage('Build docker') {
-            dockerImage = docker.build("visitback:${env.BUILD_NUMBER}") {
-                from "adoptopenjdk/openjdk11:alpine"
 
-                // Copy the JAR file from the build directory to the Docker image
-                copy "build/libs/*.jar", "app.jar"
+      stage('Build docker') {
+             dockerImage = docker.build("visitback:${env.BUILD_NUMBER}")
+      }
 
-                // Expose port 8081
-                expose 8081
-
-                // Start the Spring Boot application
-                cmd ["java", "-jar", "app.jar"]
-            }
-        }
-
-        stage('Deploy docker') {
-            echo "Docker Image Tag Name: ${dockerImageTag}"
-            sh "docker stop visitback || true && docker rm visitback || true"
-            sh "docker run --name visitback -d -p 8081:8081 visitback:${env.BUILD_NUMBER}"
-        }
+      stage('Deploy docker'){
+              echo "Docker Image Tag Name: ${dockerImageTag}"
+              sh "docker stop visitback || true && docker rm visitback || true"
+              sh "docker run --name visitback -d -p 8081:8081 visitback:${env.BUILD_NUMBER}"
+      }
+      
+      
     } catch (e) {
         currentBuild.result = "FAILED"
         throw e
