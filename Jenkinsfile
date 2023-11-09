@@ -1,23 +1,49 @@
-pipeline {
-    agent any
+node {
+    def WORKSPACE = "/var/lib/jenkins/workspace/visit-back-demo-deploy"
+    def dockerImageTag = "visitBack${env.BUILD_NUMBER}"
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/montassar95/visitBack.git'
-            }
-        }
+try{
+     notifyBuild('STARTED')
+     stage('Clone Repo') {
+        // for display purposes
+        // Get some code from a GitHub repository
+        git url: 'https://github.com/montassar95/visitBack.git',
+            credentialsId: 'visitBack-user',
+            branch: 'master'
+     }
+      stage('Build docker') {
+             dockerImage = docker.build("visitBack:${env.BUILD_NUMBER}")
+      }
 
-        stage('Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
+      stage('Deploy docker'){
+              echo "Docker Image Tag Name: ${dockerImageTag}"
+              sh "docker stop visitBack || true && docker rm visitBack || true"
+              sh "docker run --name visitBack -d -p 8081:8081 visitBack:${env.BUILD_NUMBER}"
+      }
+}catch(e){
+    currentBuild.result = "FAILED"
+    throw e
+}finally{
+    notifyBuild(currentBuild.result)
+ }
+}
 
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-    }
+def notifyBuild(String buildStatus = 'STARTED'){
+
+// build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def now = new Date()
+  // message
+  def subject = "${buildStatus}, Job: ${env.JOB_NAME} FRONTEND - Deployment Sequence: [${env.BUILD_NUMBER}] "
+  def summary = "${subject} - Check On: (${env.BUILD_URL}) - Time: ${now}"
+  def subject_email = "Spring boot Deployment"
+  def details = """<p>${buildStatus} JOB </p>
+    <p>Job: ${env.JOB_NAME} - Deployment Sequence: [${env.BUILD_NUMBER}] - Time: ${now}</p>
+    <p>Check console output at "<a href="${env.BUILD_URL}">${env.JOB_NAME}</a>"</p>"""
+
+
+   
 }
