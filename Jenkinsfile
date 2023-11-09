@@ -11,7 +11,15 @@ try{
             credentialsId: 'visitBack-user',
             branch: 'master'
      }
-      
+      stage('Build docker') {
+             dockerImage = docker.build("visitBack:${env.BUILD_NUMBER}")
+      }
+
+      stage('Deploy docker'){
+              echo "Docker Image Tag Name: ${dockerImageTag}"
+              sh "docker stop visitBack || true && docker rm visitBack || true"
+              sh "docker run --name visitBack -d -p 8081:8081 visitBack:${env.BUILD_NUMBER}"
+      }
 }catch(e){
     currentBuild.result = "FAILED"
     throw e
