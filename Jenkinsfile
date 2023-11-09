@@ -1,6 +1,23 @@
-node {
+pipeline {
+    agent any
 
- 
-  def mvnHome = tool 'maven'
-  sh "${mvnHome}/bin/mvn -B clean install"
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/montassar95/visitBack.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+    }
 }
