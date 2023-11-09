@@ -14,7 +14,7 @@ RUN mvn clean package
 # Stage 2: Create the final image
 FROM openjdk:8-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/*.jar /app/app.jar
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8081
 ENTRYPOINT ["java","-jar","-Xmx1024M","-Dserver.port=${PORT}","app.jar"]
 
