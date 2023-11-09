@@ -1,7 +1,7 @@
  
 
 ## Stage 1: Build the application
-#FROM maven:3.6.3-openjdk-8-slim AS build
+#FROM maven:3.6.3-openjdk-11-slim AS build
 #WORKDIR /app
 #COPY . /app
 #RUN mvn clean package
