@@ -14,9 +14,9 @@ RUN mvn clean package
 # Stage 2: Create the final image
 FROM openjdk:8-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/visitBack.jar /app/visitBack.jar
+COPY --from=build /app/target/*.jar /app/app.jar
 EXPOSE 8081
-CMD ["java", "-jar", "visitBack.jar"]
+ENTRYPOINT ["java","-jar","-Xmx1024M","-Dserver.port=${PORT}","app.jar"]
 
 
 
