@@ -15,7 +15,8 @@ RUN mvn clean package
 FROM openjdk:8-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8081
+ENV PORT 8081
+EXPOSE $PORT
 ENTRYPOINT ["java","-jar","-Xmx1024M","-Dserver.port=${PORT}","app.jar"]
 
 
