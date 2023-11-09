@@ -1,1 +1,1 @@
-echo "Bonjour"
+mvn test
