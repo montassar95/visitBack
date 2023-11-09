@@ -1,24 +1,25 @@
 node {
     def WORKSPACE = "/var/lib/jenkins/workspace/visit-back-demo-deploy"
-    def dockerImageTag = "visitBack${env.BUILD_NUMBER}"
+    def dockerImageTag = "visitback${env.BUILD_NUMBER}"
 
 try{
      notifyBuild('STARTED')
      stage('Clone Repo') {
         // for display purposes
         // Get some code from a GitHub repository
-        git url: 'https://github.com/montassar95/visitBack.git',
-            credentialsId: 'visitBack-user',
+        git url: 'https://github.com/montassar95/visitback.git',
+            credentialsId: 'visitback-user',
             branch: 'master'
      }
       stage('Build docker') {
-             dockerImage = docker.build("visitBack:${env.BUILD_NUMBER}")
+             dockerImage = docker.build("visitback:${env.BUILD_NUMBER}")
       }
+      
 
       stage('Deploy docker'){
               echo "Docker Image Tag Name: ${dockerImageTag}"
-              sh "docker stop visitBack || true && docker rm visitBack || true"
-              sh "docker run --name visitBack -d -p 8081:8081 visitBack:${env.BUILD_NUMBER}"
+              sh "docker stop visitback || true && docker rm visitback || true"
+              sh "docker run --name visitback -d -p 8081:8081 visitback:${env.BUILD_NUMBER}"
       }
 }catch(e){
     currentBuild.result = "FAILED"
