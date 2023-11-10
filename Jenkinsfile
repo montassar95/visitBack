@@ -24,6 +24,11 @@ node {
               sh "docker run --name visitback -d -p 8081:8081 visitback:${env.BUILD_NUMBER}"
       }
       
+       stage('Deploy k8s'){
+              
+              sh "kubectl apply -f k8s-deployment.yaml"
+              
+      }
       
     } catch (e) {
         currentBuild.result = "FAILED"
