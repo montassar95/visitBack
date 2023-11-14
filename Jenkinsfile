@@ -27,6 +27,8 @@ node {
        stage('Deploy k8s'){
               echo " lancement k8s "
               sh "kubectl apply -f k8s-deployment.yaml"
+              sh "kubectl apply -f service.yaml"
+              
               
       }
       
