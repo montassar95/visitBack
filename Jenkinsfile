@@ -1,6 +1,6 @@
 node {
     def WORKSPACE = "/var/lib/jenkins/workspace/visit-back-demo-deploy"
-    def dockerImageTag = "visitback:${env.BUILD_NUMBER}"
+    def dockerImageTag = "visitback:${env.BUILD_NUMBER}.0"
     def dockerHubUsername = "montassar95"
     def dockerHubPassword = "123456docker"
 
@@ -28,7 +28,7 @@ node {
             sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
              // Pousser l'image vers Docker Hub
-            sh "docker push ${dockerHubUsername}/${dockerImageTag}.0"
+            sh "docker push ${dockerHubUsername}/${dockerImageTag}"
         }
 
         //stage('Déployer Docker') {
