@@ -21,15 +21,15 @@ node {
             sh "docker images"
         }
 
-        //stage('Push vers Docker Hub') {
+        stage('Push vers Docker Hub') {
         
-         // echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
+          echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
             // Connecter Docker à Docker Hub
-           // sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
+            sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
-            // Pousser l'image vers Docker Hub
-            //sh "docker push ${dockerHubUsername}/${dockerImageTag}"
-        //}
+             // Pousser l'image vers Docker Hub
+            sh "docker push ${dockerHubUsername}/${dockerImageTag}"
+        }
 
         //stage('Déployer Docker') {
             echo "Nom du tag de l'image Docker au Déployement : ${dockerImageTag}"
