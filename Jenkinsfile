@@ -28,7 +28,7 @@ node {
             sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
              // Pousser l'image vers Docker Hub
-            sh "docker push ${dockerHubUsername}/${dockerImageTag}"
+            sh "docker push ${dockerHubUsername}/visitback:latest"
         }
 
         //stage('Déployer Docker') {
