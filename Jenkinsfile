@@ -18,23 +18,24 @@ node {
           echo "Nom du tag de l'image Docker au Build Docker : ${dockerImageTag}"
             // Construire l'image Docker
             dockerImage = docker.build("${dockerImageTag}")
+            sh "docker images"
         }
 
-        stage('Push vers Docker Hub') {
+        //stage('Push vers Docker Hub') {
         
-          echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
+         // echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
             // Connecter Docker à Docker Hub
-            sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
+           // sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
             // Pousser l'image vers Docker Hub
-            sh "docker push ${dockerHubUsername}/${dockerImageTag}"
-        }
+            //sh "docker push ${dockerHubUsername}/${dockerImageTag}"
+        //}
 
-        stage('Déployer Docker') {
+        //stage('Déployer Docker') {
             echo "Nom du tag de l'image Docker au Déployement : ${dockerImageTag}"
           //  sh "docker stop visitback || true && docker rm visitback || true"
           //  sh "docker run --name visitback -d -p 8081:8081 ${dockerHubUsername}/${dockerImageTag}"
-        }
+        //}
 
     } catch (e) {
         currentBuild.result = "FAILED"
