@@ -15,9 +15,9 @@ node {
         
         
 
-      stage('minikube env') {
-            sh "eval $(minikube docker-env)"
-      }
+  //    stage('minikube env') {
+  //          sh "eval $(minikube docker-env)"
+  //    }
 
 
       stage('Build docker') {
@@ -28,7 +28,7 @@ node {
               echo "Docker Image Tag Name: ${dockerImageTag}"
               sh "docker stop visitback || true && docker rm visitback || true"
               sh "docker run --name visitback -d -p 8081:8081 visitback:${env.BUILD_NUMBER}"
-      }
+     }
       
        stage('Deploy k8s'){
               echo " lancement k8s "
