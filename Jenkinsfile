@@ -24,13 +24,13 @@ node {
             sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
             // Pousser l'image vers Docker Hub
-            sh "docker push ${dockerHubUsername}/visitback:${dockerImageTag}"
+            sh "docker push ${dockerHubUsername}/visitback:${env.BUILD_NUMBER}"
         }
 
         stage('Déployer Docker') {
             echo "Nom du tag de l'image Docker : ${dockerImageTag}"
           //  sh "docker stop visitback || true && docker rm visitback || true"
-          //  sh "docker run --name visitback -d -p 8081:8081 ${dockerHubUsername}/visitback:${dockerImageTag}"
+          //  sh "docker run --name visitback -d -p 8081:8081 ${dockerHubUsername}/${dockerImageTag}"
         }
 
     } catch (e) {
