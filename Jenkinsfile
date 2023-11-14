@@ -17,7 +17,8 @@ node {
         stage('Build Docker') {
           echo "Nom du tag de l'image Docker au Build Docker : ${dockerImageTag}"
             // Construire l'image Docker
-            dockerImage = docker.build("${dockerImageTag}")
+            //dockerImage = docker.build("${dockerImageTag}")
+            sh "docker build -t ${dockerImageTag} ."
             sh "docker images"
         }
 
