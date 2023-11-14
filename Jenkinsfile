@@ -28,7 +28,8 @@ node {
             // Connecter Docker à Docker Hub
             sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
-			sh 'docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} '
+			echo "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
+			sh "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
              // Pousser l'image vers Docker Hub
             sh "docker push ${dockerHubUsername}/${dockerImageTag}"
         }
