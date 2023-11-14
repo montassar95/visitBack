@@ -17,9 +17,12 @@ node {
         stage('Build Docker') {
           echo "Nom du tag de l'image Docker au Build Docker : ${dockerImageTag}"
             // Construire l'image Docker
+           // without Tag :  sh "docker build -t ${dockerHubUsername}/${dockerImageTag} ."
             //dockerImage = docker.build("${dockerImageTag}")
-            sh "docker build -t ${dockerHubUsername}/${dockerImageTag} ."
+            sh "docker build -t ${dockerImageTag} ."
             sh "docker images"
+            
+            
         }
 
         stage('Push vers Docker Hub') {
@@ -28,17 +31,28 @@ node {
             // Connecter Docker à Docker Hub
             sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
-			//echo "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
-			//sh "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
+			 echo "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
+			 sh "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
              // Pousser l'image vers Docker Hub
             sh "docker push ${dockerHubUsername}/${dockerImageTag}"
         }
 
         //stage('Déployer Docker') {
-            echo "Nom du tag de l'image Docker au Déployement : ${dockerImageTag}"
+           // echo "Nom du tag de l'image Docker au Déployement : ${dockerImageTag}"
           //  sh "docker stop visitback || true && docker rm visitback || true"
           //  sh "docker run --name visitback -d -p 8081:8081 ${dockerHubUsername}/${dockerImageTag}"
         //}
+        
+        stage('Déploiement Kubernetes') {
+    		steps {
+        		script {
+            		// Déployer l'application sur Kubernetes
+            		sh 'kubectl apply -f k8s-deployment.yaml' 
+            		sh 'kubectl apply -f service.yaml'
+        		}
+   	 	}
+}
+        
 
     } catch (e) {
         currentBuild.result = "FAILED"

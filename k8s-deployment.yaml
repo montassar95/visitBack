@@ -15,6 +15,6 @@ spec:
       containers:
         - name: visitback
           image: visitback:${env.BUILD_NUMBER} # Image that will be used to containers in the cluster
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy:  Always  #IfNotPresent
           ports:
             - containerPort: 8081 # The port that the container is running on in the cluster
