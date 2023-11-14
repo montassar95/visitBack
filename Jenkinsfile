@@ -16,19 +16,21 @@ node {
 
         stage('Build Docker') {
             // Construire l'image Docker
-            dockerImage = docker.build("visitback:${dockerImageTag}")
+            dockerImage = docker.build("${dockerImageTag}")
         }
 
         stage('Push vers Docker Hub') {
+        
+          echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
             // Connecter Docker à Docker Hub
             sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
             // Pousser l'image vers Docker Hub
-            sh "docker push ${dockerHubUsername}/visitback:${env.BUILD_NUMBER}"
+            sh "docker push ${dockerHubUsername}/${dockerImageTag}"
         }
 
         stage('Déployer Docker') {
-            echo "Nom du tag de l'image Docker : ${dockerImageTag}"
+            echo "Nom du tag de l'image Docker au Déployement : ${dockerImageTag}"
           //  sh "docker stop visitback || true && docker rm visitback || true"
           //  sh "docker run --name visitback -d -p 8081:8081 ${dockerHubUsername}/${dockerImageTag}"
         }
