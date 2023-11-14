@@ -12,6 +12,12 @@ node {
                 credentialsId: 'visitback-user',
                 branch: 'master'
         }
+        
+        
+
+      stage('minikube env') {
+            sh "eval $(minikube docker-env)"
+      }
 
 
       stage('Build docker') {
