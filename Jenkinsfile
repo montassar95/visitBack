@@ -42,18 +42,21 @@ node {
           //  sh "docker stop visitback || true && docker rm visitback || true"
           //  sh "docker run --name visitback -d -p 8081:8081 ${dockerHubUsername}/${dockerImageTag}"
         //}
-        
-        stage('Déploiement Kubernetes') {
-    		steps {
-        		script {
-            		// Déployer l'application sur Kubernetes
-            		sh 'kubectl apply -f k8s-deployment.yaml' 
-            		sh 'kubectl apply -f service.yaml'
-        		}
-   	 	}
-}
-        
 
+
+		
+		stage('Déploiement Kubernetes') {
+  
+  			echo "lancement du deploiment kubernetes"
+            // Déployer l'application sur Kubernetes
+            sh 'kubectl apply -f k8s-deployment.yaml'
+            sh 'kubectl apply -f service.yaml'
+    
+		}
+		
+		
+		
+		
     } catch (e) {
         currentBuild.result = "FAILED"
         throw e
