@@ -48,6 +48,7 @@ node {
 		stage('Déploiement Kubernetes') {
   
   			echo "lancement du deploiment kubernetes"
+            sh 'kubectl config use-context minikube'  // Assurez-vous que le contexte est correct
             // Déployer l'application sur Kubernetes
             sh 'kubectl apply -f k8s-deployment.yaml'
             sh 'kubectl apply -f service.yaml'
