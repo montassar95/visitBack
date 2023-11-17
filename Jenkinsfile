@@ -29,7 +29,11 @@ node {
         
           echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
             // Connecter Docker à Docker Hub
-            sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
+                  withCredentials([string(credentialsId: 'montassar-docker-hub-credentials-id', variable: 'dockerhubpwd')]) {
+                   sh 'docker login -u ${dockerHubUsername} -p ${dockerhubpwd}'
+
+             }
+         // old job  sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
 			 echo "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
 			 sh "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
