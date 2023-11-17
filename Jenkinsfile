@@ -2,7 +2,7 @@ node {
     def WORKSPACE = "/var/lib/jenkins/workspace/visit-back-demo-deploy"
     def dockerImageTag = "visitback"
     def dockerHubUsername = "montassar95"
-    def dockerHubPassword = "123456docker"
+    def dockerHubPasswordX = "123456docker"
 
     try {
         notifyBuild('STARTED')
@@ -33,12 +33,15 @@ node {
               //     sh 'docker login -u ${dockerHubUsername} -p ${dockerhubpwd}'
 
              //}
-          sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
-
+          //sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
+withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+   sh 'docker login -u montassar95 -p ${dockerhubpwd}'
+}
 			 echo "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
 			 sh "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
              // Pousser l'image vers Docker Hub
             sh "docker push ${dockerHubUsername}/${dockerImageTag}"
+           
         }
 
         //stage('Déployer Docker') {
