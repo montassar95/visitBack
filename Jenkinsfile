@@ -29,11 +29,11 @@ node {
         
           echo "Nom du tag de l'image Docker au Push : ${dockerImageTag}"
             // Connecter Docker à Docker Hub
-             withCredentials([string(credentialsId: 'montassar-docker-hub-credentials-id', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u ${dockerHubUsername} -p ${dockerhubpwd}'
+            // withCredentials([string(credentialsId: 'montassar-docker-hub-credentials-id', variable: 'dockerhubpwd')]) {
+              //     sh 'docker login -u ${dockerHubUsername} -p ${dockerhubpwd}'
 
-             }
-         // old job  sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
+             //}
+          sh "docker login -u ${dockerHubUsername} -p ${dockerHubPassword}"
 
 			 echo "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
 			 sh "docker tag ${dockerImageTag} ${dockerHubUsername}/${dockerImageTag} "
@@ -52,12 +52,18 @@ node {
 		stage('Déploiement Kubernetes') {
   
   			echo "lancement du deploiment kubernetes"
+
+            kubernetesDeploy (configs: 'k8s-deployment.yaml', kubeconfigId: 'k8sconfigpwd')
+
+
+
+            
            // sh 'kubectl config use-context minikube'  // Assurez-vous que le contexte est correct
-           sh 'kubectl --kubeconfig=/home/montassar/.kube/config apply -f k8s-deployment.yaml'
-           sh 'kubectl --kubeconfig=/home/montassar/.kube/config apply -f service.yaml'
+           //sh 'kubectl --kubeconfig=/home/montassar/.kube/config apply -f k8s-deployment.yaml'
+           //sh 'kubectl --kubeconfig=/home/montassar/.kube/config apply -f service.yaml'
             // Déployer l'application sur Kubernetes
-            sh 'kubectl apply -f k8s-deployment.yaml'
-            sh 'kubectl apply -f service.yaml'
+            //sh 'kubectl apply -f k8s-deployment.yaml'
+            //sh 'kubectl apply -f service.yaml'
     
 		}
 		
