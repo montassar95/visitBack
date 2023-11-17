@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: spring-boot-k8s
-          image: montassar95/visitback:75.0 # Image that will be used to containers in the cluster
+          image: montassar95/visitback # Image that will be used to containers in the cluster
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081 # The port that the container is running on in the cluster

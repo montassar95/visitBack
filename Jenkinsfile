@@ -1,6 +1,6 @@
 node {
     def WORKSPACE = "/var/lib/jenkins/workspace/visit-back-demo-deploy"
-    def dockerImageTag = "visitback:${env.BUILD_NUMBER}.0"
+    def dockerImageTag = "visitback"
     def dockerHubUsername = "montassar95"
     def dockerHubPassword = "123456docker"
 
