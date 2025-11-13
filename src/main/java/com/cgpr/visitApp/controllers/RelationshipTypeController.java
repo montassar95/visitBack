@@ -5,8 +5,10 @@ import static com.cgpr.visitApp.utils.Constants.APP_ROOT;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,7 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cgpr.visitApp.dto.DayDto;
+import com.cgpr.visitApp.dto.EventSMSDto;
+import com.cgpr.visitApp.dto.PrisonerDto;
 import com.cgpr.visitApp.dto.RelationshipTypeDto;
+import com.cgpr.visitApp.dto.VisitorDto;
 import com.cgpr.visitApp.model.RelationshipType;
 import com.cgpr.visitApp.repository.PrisonerPenalRepository;
 import com.cgpr.visitApp.services.PdfService;
@@ -40,7 +45,7 @@ public class RelationshipTypeController {
 
     private RelationshipTypeService relationshipTypeService;
     private PrisonerPenalRepository prisonerPenalRepository;
-    private PdfService pdfService;
+    private PdfService pdfService; 
 
     @Autowired
     public RelationshipTypeController(RelationshipTypeService relationshipTypeService, PrisonerPenalRepository prisonerPenalRepository, PdfService pdfService) {
@@ -60,10 +65,38 @@ public class RelationshipTypeController {
     public ResponseEntity<RelationshipTypeDto> findByPrisonerId(@PathVariable("id") String idPrisoner) {
         return ResponseEntity.ok(relationshipTypeService.findByPrisonerId(idPrisoner));
     }
+    
+    @GetMapping(path = APP_ROOT + "relationshipTypes/idPrisonerFromPenal/{id}", 
+            produces = MediaType.APPLICATION_JSON_VALUE)
+public ResponseEntity<?> findByPrisonerIdFromPenal(@PathVariable("id") String idPrisoner) {
+    try {
+        System.out.println(">>> ID reçu = " + idPrisoner);
+        RelationshipTypeDto dto = relationshipTypeService.findByPrisonerIdFromPenal(idPrisoner);
+        if (dto == null) {
+            return ResponseEntity.notFound().build(); // si aucun résultat
+        }
+        return ResponseEntity.ok(dto);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.badRequest().body("Erreur côté backend : " + e.getMessage());
+    }
+}
+      
+    @GetMapping(path = APP_ROOT + "relationshipTypes/findResidantPrisonersByLocation/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PrisonerDto>> findResidantPrisonersByLocation(
+            @PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
+        // Gérer les dates
+     
 
+        return ResponseEntity.ok(relationshipTypeService.findResidantPrisonersByLocation(gouvernorat, prison));
+    }
+    
+    
+    
+    
     // Endpoint pour rechercher les prisonniers entrants par période et emplacement
     @GetMapping(path = APP_ROOT + "relationshipTypes/findPrisonersEnteringByPeriodAndLocation/{startDate}/{endDate}/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RelationshipTypeDto>> findPrisonersEnteringByPeriodandLocation(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
+    public ResponseEntity<List<PrisonerDto>> findPrisonersEnteringByPeriodandLocation(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
             @PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
         // Gérer les dates
         SimpleDateFormat originalDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -84,7 +117,7 @@ public class RelationshipTypeController {
 
     // Endpoint pour rechercher les prisonniers en mutation par période et emplacement
     @GetMapping(path = APP_ROOT + "relationshipTypes/findPrisonersMutatingByPeriodAndLocation/{startDate}/{endDate}/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RelationshipTypeDto>> findPrisonersMutatingByPeriodandLocation(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
+    public ResponseEntity<List<PrisonerDto>> findPrisonersMutatingByPeriodandLocation(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
             @PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
         // Gérer les dates
         SimpleDateFormat originalDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -103,6 +136,31 @@ public class RelationshipTypeController {
         return ResponseEntity.ok(relationshipTypeService.findPrisonersMutatingByPeriodandLocation(startDateUpdated, endDateUpdated, gouvernorat, prison));
     }
 
+    
+    @GetMapping(path = APP_ROOT + "relationshipTypes/findPrisonersMutatingSortantByPeriodandLocation/{startDate}/{endDate}/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PrisonerDto>> findPrisonersMutatingSortantByPeriodandLocation(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
+            @PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
+        // Gérer les dates
+        SimpleDateFormat originalDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateToUpdated = null;
+        Date endDateToUpdated = null;
+        try {
+            startDateToUpdated = originalDateFormat.parse(startDate);
+            endDateToUpdated = originalDateFormat.parse(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SimpleDateFormat newDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String startDateUpdated = newDateFormat.format(startDateToUpdated);
+        String endDateUpdated = newDateFormat.format(endDateToUpdated);
+
+        return ResponseEntity.ok(relationshipTypeService.findPrisonersMutatingSortantByPeriodandLocation(startDateUpdated, endDateUpdated, gouvernorat, prison));
+    }
+
+    
+    
+    
+    
     // Endpoint pour rechercher les prisonniers quittant par période et emplacement
     @GetMapping(path = APP_ROOT + "relationshipTypes/findPrisonersLeavingByPeriodAndLocation/{startDate}/{endDate}/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RelationshipTypeDto>> findPrisonersLeavingByPeriodandLocation(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
@@ -124,12 +182,88 @@ public class RelationshipTypeController {
         return ResponseEntity.ok(relationshipTypeService.findPrisonersLeavingByPeriodandLocation(startDateUpdated, endDateUpdated, gouvernorat, prison));
     }
 
-    // Endpoint pour rechercher les prisonniers existants sans visite par emplacement
+//    // Endpoint pour rechercher les prisonniers existants sans visite par emplacement
+    
+//    @GetMapping(path = APP_ROOT + "relationshipTypes/findPrisonersExistingByLocationWithOutVisit/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<RelationshipTypeDto>> findPrisonersExistingByLocationWithOutVisit(@PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
+//        return ResponseEntity.ok(relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat, prison));
+//    }
+    
     @GetMapping(path = APP_ROOT + "relationshipTypes/findPrisonersExistingByLocationWithOutVisit/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RelationshipTypeDto>> findPrisonersExistingByLocationWithOutVisit(@PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
-        return ResponseEntity.ok(relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat, prison));
+    public ResponseEntity<List<PrisonerDto>> findPrisonersExistingByLocationWithOutVisit(
+            @PathVariable("gouvernorat") String gouvernorat,
+            @PathVariable("prison") String prison,
+            
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String prenom,
+            @RequestParam(required = false) String nomPere  ) {
+
+        // Afficher tous les paramètres pour debug
+        System.out.println("Gouvernorat: " + gouvernorat);
+        System.out.println("Prison: " + prison);
+     
+        System.out.println("Nom: " + nom);
+        System.out.println("Prenom: " + prenom);
+        System.out.println("NomPere: " + nomPere);
+   
+
+        return ResponseEntity.ok(
+            relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat, prison,nom,prenom,nomPere )
+        );
     }
 
+    @GetMapping(path = APP_ROOT + "relationshipTypes/findAllPrisonersExisting/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RelationshipTypeDto>> findAllPrisonersExisting(
+            @PathVariable("gouvernorat") String gouvernorat,
+            @PathVariable("prison") String prison,
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String prenom,
+            @RequestParam(required = false) String nomPere,  
+            @RequestParam(required = false) String idPrisoner,
+            @RequestParam(required = false) String numeroEcrou) {
+    	 
+        // Afficher tous les paramètres pour debug
+        System.out.println("Gouvernorat: " + gouvernorat);
+        System.out.println("Prison: " + prison);
+        System.out.println("Nom: " + nom);
+        System.out.println("Prenom: " + prenom);
+        System.out.println("NomPere: " + nomPere);
+   
+        System.out.println("idPrisoner: " + idPrisoner);
+        System.out.println("numeroEcrou: " + numeroEcrou);
+
+        return ResponseEntity.ok(
+            relationshipTypeService.findAllPrisonersExisting(gouvernorat, prison,nom,prenom,nomPere ,idPrisoner ,numeroEcrou)
+        );
+    }
+
+    
+    @GetMapping(path = APP_ROOT + "relationshipTypes/findAllPrisonersExistingFromPenal/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RelationshipTypeDto>> findAllPrisonersExistingFromPenal(
+            @PathVariable("gouvernorat") String gouvernorat,
+            @PathVariable("prison") String prison,
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String prenom,
+            @RequestParam(required = false) String nomPere,  
+            @RequestParam(required = false) String idPrisoner,
+            @RequestParam(required = false) String numeroEcrou) {
+    	 
+        // Afficher tous les paramètres pour debug
+        System.out.println("Gouvernorat: " + gouvernorat);
+        System.out.println("Prison: " + prison);
+        System.out.println("Nom: " + nom);
+        System.out.println("Prenom: " + prenom);
+        System.out.println("NomPere: " + nomPere);
+   
+        System.out.println("idPrisoner: " + idPrisoner);
+        System.out.println("numeroEcrou: " + numeroEcrou);
+
+        return ResponseEntity.ok(
+            relationshipTypeService.findAllPrisonersExistingFromPenal(gouvernorat, prison,nom,prenom,nomPere ,idPrisoner ,numeroEcrou)
+        );
+    }
+    
+    
     // Endpoint pour mettre à jour le statut de résidence des relations
     @GetMapping(path = APP_ROOT + "relationshipTypes/updateRelationshipTypeStatutResidance", produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateRelationshipTypeStatutResidance() {
@@ -137,17 +271,46 @@ public class RelationshipTypeController {
     }
 
     // Endpoint pour obtenir la matrice de compte pour le tableau de bord
-    @GetMapping(path = APP_ROOT + "relationshipTypes/getCountMatrix/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<List<String>> getCountMatrix(@PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
-        return relationshipTypeService.getCountMatrix(gouvernorat, prison);
+    @GetMapping(path = APP_ROOT + "relationshipTypes/getCountMatrix/{gouvernorat}/{prison}/{centre}/{salle}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<List<String>> getCountMatrix(@PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison, @PathVariable("centre") String centre ,  @PathVariable("salle") String salle) {
+    	  // Afficher les paramètres reçus
+        System.out.println("Gouvernorat: " + gouvernorat);
+        System.out.println("Prison: " + prison);
+        System.out.println("Centre: " + centre);
+        System.out.println("Salle: " + salle);
+    	
+    	return relationshipTypeService.getCountMatrix(gouvernorat, prison, centre, salle);
     }
 
-    // Endpoint pour rechercher les relations par heure, jour, emplacement et statut "Ouvert"
-    @GetMapping(path = APP_ROOT + "relationshipTypes/findByTimeAndDayAndPrisonAndStatutOpen/{time}/{day}/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RelationshipTypeDto>> findByTimeAndDayAndPrisonAndStatutOpen(@PathVariable("time") String time, @PathVariable("day") String day,
-            @PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
-        return ResponseEntity.ok(relationshipTypeService.findByTimeAndDayAndPrisonAndStatutO(time, day, gouvernorat, prison));
-    }
+//    // Endpoint pour rechercher les relations par heure, jour, emplacement et statut "Ouvert"
+//    @GetMapping(path = APP_ROOT + "relationshipTypes/findByTimeAndDayAndPrisonAndStatutOpen/{time}/{day}/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<RelationshipTypeDto>> findByTimeAndDayAndPrisonAndStatutOpen(@PathVariable("time") String time, @PathVariable("day") String day,
+//            @PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison) {
+//        return ResponseEntity.ok(relationshipTypeService.findByTimeAndDayAndPrisonAndStatutO(time, day, gouvernorat, prison));
+//    }
+ // Endpoint pour rechercher les relations par heure, jour, emplacement, statut "Ouvert" + infos personnelles
+    @GetMapping(path = APP_ROOT + 
+    	    "relationshipTypes/findByTimeAndDayAndPrisonAndStatutOpen/{gouvernorat}/{prison}",
+    	    produces = MediaType.APPLICATION_JSON_VALUE)
+    	public ResponseEntity<List<RelationshipTypeDto>> findByTimeAndDayAndPrisonAndStatutOpen(
+    	        @PathVariable("gouvernorat") String gouvernorat,
+    	        @PathVariable("prison") String prison,
+    	        @RequestParam(value = "time", required = false) String time,
+    	        @RequestParam(value = "day", required = false) String day,
+    	        @RequestParam(value = "nom", required = false) String nom,
+    	        @RequestParam(value = "prenom", required = false) String prenom,
+    	        @RequestParam(value = "nomPere", required = false) String nomPere,
+    	        
+    	        @RequestParam(value = "idPrisoner", required = false) String idPrisoner,
+    	        @RequestParam(value = "numeroEcrou", required = false) String numeroEcrou 
+    	) {
+    	    return ResponseEntity.ok(
+    	        relationshipTypeService.findByTimeAndDayAndPrisonAndStatutO(
+    	            time, day, gouvernorat, prison, nom, prenom, nomPere ,idPrisoner,numeroEcrou
+    	        )
+    	    );
+    	}
+
 
     // Endpoint pour rechercher les relations par emplacement et statut "Non Ouvert"
     @GetMapping(path = APP_ROOT + "relationshipTypes/findByPrisonAndStatutNotOpen/{gouvernorat}/{prison}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -169,11 +332,19 @@ public class RelationshipTypeController {
             @RequestParam(name = "dateEnd") String dateEnd) {
     	
     	
-    	
+
     
     	if (statutResidance.trim().equalsIgnoreCase("withOutVisit")) {
     		
-    		  return ResponseEntity.ok(relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat.trim(), prison.trim()));
+//    		  return ResponseEntity.ok(relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat.trim(), prison.trim(),null ,null,null ));
+    	
+    	
+     		    return ResponseEntity.ok(relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat.trim(), prison.trim(),null ,null,null ).stream()
+            .map(p -> RelationshipTypeDto.convertPrisonerDtoToRelationshipTypeDto(p, new ArrayList<VisitorDto>()))
+             .collect(Collectors.toList()));
+    	
+    	
+    	
     	}
         
         
@@ -200,11 +371,11 @@ public class RelationshipTypeController {
         String titre = buildTitle(gouvernorat, prison, statutResidance, statutSMS);
 
         byte[] pdfData = null;
-        List<RelationshipTypeDto> list = null;
+        List<PrisonerDto> list = null;
         try {
           if (statutResidance.trim().equalsIgnoreCase ("withOutVisit")) {
         	 System.err.println("avant . "+pdfData==null);
-               list= relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat.trim(), prison.trim());
+               list= relationshipTypeService.findPrisonersExistingByLocationWithOutVisit(gouvernorat.trim(), prison.trim(),null ,null,null );
                System.err.println("Le PDF est généré pour WithOutVisit. "+list.size());
                 pdfData = pdfService.exportWithOutVisitPdf(list, nomPrison, titre);
                 System.err.println("apres . "+pdfData==null);
@@ -261,7 +432,7 @@ public class RelationshipTypeController {
     		 
               	
         	String nomPrison = prisonerPenalRepository.findPrisonByCode(gouvernorat, prison).getName();
-                  pdfData = pdfService.exportPdf(relationshipTypeService.findByTimeAndDayAndPrisonAndStatutO(time, day, gouvernorat, prison), nomPrison, titre);
+                  pdfData = pdfService.exportPdf(relationshipTypeService.findByTimeAndDayAndPrisonAndStatutO(time, day, gouvernorat, prison,null,null, null,null, null), nomPrison, titre);
 
                  
              
@@ -281,6 +452,14 @@ public class RelationshipTypeController {
           }
         
     }
+    
+    @GetMapping(path = APP_ROOT + "relationshipTypes/entrant/{prisonerId}",   produces = MediaType.APPLICATION_JSON_VALUE)
+     
+    public List<EventSMSDto> getEntrantEvents(@PathVariable String prisonerId) {
+        return relationshipTypeService.getEntrantEvents(prisonerId);
+    }
+    
+    
 //    @GetMapping(path = APP_ROOT + "relationshipTypes/findByStatusesPdf/{gouvernorat}/{prison}/{statutResidance}/{statutSMS}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 //    public ResponseEntity<byte[]> findByStatusesPdf(@PathVariable("gouvernorat") String gouvernorat, @PathVariable("prison") String prison, @PathVariable("statutResidance") String statutResidance, 
 //    		@PathVariable("statutSMS") String statutSMS ,

@@ -88,4 +88,6 @@ public class PrisonerServiceImpl implements PrisonerService {
 		// TODO Auto-generated method stub
 		return  prisonerPenalRepository.findAllPrisons();
 	}
+	
+	
 }

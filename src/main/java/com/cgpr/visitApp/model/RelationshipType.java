@@ -40,8 +40,8 @@ public class RelationshipType{
     
     private String day;
     private String time;
-     private String codeGouvernorat;
-	private String codePrison;
+    private String codeGouvernorat;
+	private String  codePrison;
 	private String  namePrison ;
 	private String  codeResidance;
 	private String  anneeResidance;
@@ -58,10 +58,16 @@ public class RelationshipType{
 	
 	private Date sentDate;
 	
+	
+	private String centre;
+	private String salle;
+	
+	private String statutDLR;
+	private Date dlrDate;
 	public RelationshipType(Prisoner prisoner, Visitor visitor, String relationShip, String day, String time,
 			String codeGouvernorat, String codePrison, String namePrison, String codeResidance, String anneeResidance,
 			String statutResidance, String numDetention, String libelleStatutResidance, String statutSMS,
-			String eventDate) {
+			String eventDate, Date sentDate, String centre, String salle, String statutDLR, Date dlrDate) {
 		super();
 		this.prisoner = prisoner;
 		this.visitor = visitor;
@@ -78,7 +84,15 @@ public class RelationshipType{
 		this.libelleStatutResidance = libelleStatutResidance;
 		this.statutSMS = statutSMS;
 		this.eventDate = eventDate;
+		this.sentDate = sentDate;
+		this.centre = centre;
+		this.salle = salle;
+		this.statutDLR = statutDLR;
+		this.dlrDate = dlrDate;
 	}
+
+	 
+ 
 	
 	
 	

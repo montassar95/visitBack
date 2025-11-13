@@ -11,19 +11,19 @@ import com.cgpr.visitApp.dto.PrisonerDto;
 import com.cgpr.visitApp.dto.RelationshipTypeDto;
 import com.cgpr.visitApp.model.Prisoner;
 import com.cgpr.visitApp.model.RelationshipType;
-import com.cgpr.visitApp.model.VisiteursTime;
+//import com.cgpr.visitApp.model.VisiteursTime;
 import com.cgpr.visitApp.model.Visitor;
 import com.cgpr.visitApp.repository.PrisonerPenalRepository;
 import com.cgpr.visitApp.repository.RelationshipTypeRepository;
-import com.cgpr.visitApp.repository.VisiteursTimeRepository;
+//import com.cgpr.visitApp.repository.VisiteursTimeRepository;
 
 
 @Component
 public class AddDataClass {
 	
 	
-	@Autowired
-	private   VisiteursTimeRepository visiteursTimeRepository;
+//	@Autowired
+//	private   VisiteursTimeRepository visiteursTimeRepository;
 	
 	@Autowired
 	private   PrisonerPenalRepository prisonerPenalRepository;

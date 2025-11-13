@@ -1,5 +1,6 @@
 package com.cgpr.visitApp.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -25,6 +26,9 @@ public class Prisoner {
 	private String fatherName;
 	private String  grandFatherName;
 	private String codeNationalite;
+	private String  dateDebutPunition;
+	private String  dateFinPunition;
+	
 //	private String minAdlt;
 //	private String affairType;
 //	nationalite

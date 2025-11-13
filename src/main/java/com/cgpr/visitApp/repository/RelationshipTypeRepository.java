@@ -11,12 +11,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cgpr.visitApp.dto.EventSMSDto;
+import com.cgpr.visitApp.dto.RelationshipSalleAndTimeDTO;
 import com.cgpr.visitApp.model.Prisoner;
 import com.cgpr.visitApp.model.RelationshipType;
 import com.cgpr.visitApp.model.Visitor;
  
 @Repository
-public interface  RelationshipTypeRepository extends JpaRepository<RelationshipType, Long> {
+public interface  RelationshipTypeRepository extends JpaRepository<RelationshipType, Long> , RelationshipTypeRepositoryCustom{
   
 //	// Recherche tous les RelationshipType associés à un Prisoner donné
 //    List<RelationshipType> findByPrisoner(Prisoner prisoner);
@@ -62,19 +64,29 @@ public interface  RelationshipTypeRepository extends JpaRepository<RelationshipT
 		                @Param("codePrison") String codePrison);
 
 	
-	@Query("SELECT rt FROM RelationshipType rt WHERE "
-			 + "(:time IS NULL OR rt.time = :time) AND "
-		     + "(:day IS NULL OR rt.day = :day) AND "
-			+ "rt.codeGouvernorat = :codeGouvernorat AND "
-			+ "rt.codePrison = :codePrison AND "
-			+ "(UPPER(TRIM(rt.statutResidance))) = 'O' order by rt.day , rt.time  ")
-	List<RelationshipType> findByTimeAndDayAndPrisonAndStatutO(  
-								@Param("time") String time,
-					            @Param("day") String day,
-								@Param("codeGouvernorat") String codeGouvernorat,
-					            @Param("codePrison") String codePrison);
+//	@Query("SELECT rt FROM RelationshipType rt WHERE "
+//			 + "(:time IS NULL OR rt.time = :time) AND "
+//		     + "(:day IS NULL OR rt.day = :day) AND "
+//			+ "rt.codeGouvernorat = :codeGouvernorat AND "
+//			+ "rt.codePrison = :codePrison AND "
+//			+ "(UPPER(TRIM(rt.statutResidance))) = 'O' order by rt.day , rt.time  ")
+//	 "  AND ide.TNUMIDE IN ( " +
+//     "       SELECT simp.TNUMIDE FROM TIDENSIMP@LINK_PENALE simp " +
+//     "       WHERE ( ? IS NULL OR simp.TNOMSA LIKE '%' || ? || '%' ) " +
+//     "         AND ( ? IS NULL OR simp.TPNOMSA LIKE '%' || ? || '%') " +
+//     "         AND ( ? IS NULL OR simp.TPPERSA LIKE '%' || ? || '%' ) " +
+//
+//     "  ) " +
+//	List<RelationshipType> findByTimeAndDayAndPrisonAndStatutO(  
+//								@Param("time") String time,
+//					            @Param("day") String day,
+//								@Param("codeGouvernorat") String codeGouvernorat,
+//					            @Param("codePrison") String codePrison);
 	
-	
+ 
+
+
+
 	
 	@Query("SELECT rt FROM RelationshipType rt WHERE "
 			+ "rt.codeGouvernorat = :codeGouvernorat AND "
@@ -126,13 +138,23 @@ public interface  RelationshipTypeRepository extends JpaRepository<RelationshipT
  // Compte le nombre de rendez-vous pour chaque combinaison jour/heure en fonction du codeGouvernorat et codePrison
     @Query("SELECT r.day, r.time, COUNT(DISTINCT r.prisoner.idPrisoner) " +
            "FROM RelationshipType r " +
-           "WHERE r.codeGouvernorat = :codeGouvernorat AND r.codePrison = :codePrison AND r.statutResidance = 'O'" +
+           "WHERE r.codeGouvernorat = :codeGouvernorat AND r.codePrison = :codePrison AND r.statutResidance = 'O' AND r.centre = :centre AND r.salle = :salle " +
            "GROUP BY   r.day, r.time  ")
     List<Object[]> countRelationshipsByDayAndTime (
         @Param("codeGouvernorat") String codeGouvernorat,
-        @Param("codePrison") String codePrison
+        @Param("codePrison") String codePrison,
+        @Param("centre") String centre,
+        @Param("salle") String salle
     );
-    
+    // Compte le nombre de rendez-vous pour chaque combinaison jour/heure en fonction du codeGouvernorat et codePrison
+    @Query("SELECT r.day, r.time, COUNT(DISTINCT r.prisoner.idPrisoner) " +
+           "FROM RelationshipType r " +
+           "WHERE r.codeGouvernorat = :codeGouvernorat AND r.codePrison = :codePrison AND r.statutResidance = 'O' " +
+           "GROUP BY   r.day, r.time  ")
+    List<Object[]> countRelationshipsByDayAndTimeForDashboarding (
+        @Param("codeGouvernorat") String codeGouvernorat,
+        @Param("codePrison") String codePrison  
+    );
 //    , r.prisoner.idPrisoner
     
     
@@ -141,8 +163,8 @@ public interface  RelationshipTypeRepository extends JpaRepository<RelationshipT
     @Query("UPDATE RelationshipType r SET r.statutSMS = 'READY' WHERE r.statutResidance = :statutResidance AND r.prisoner.idPrisoner IN :prisonerIds")
     void updateStatutSMSByStatutResidanceAndPrisonerIds(@Param("statutResidance") String statutResidance, @Param("prisonerIds") List<String> prisonerIds);
     
-    
-    @Query("SELECT r FROM RelationshipType r WHERE r.statutSMS = 'READY'AND r.statutResidance <> 'F' AND r.libelleStatutResidance = :parametre")
+//    r.statutSMS = 'READY'AND
+    @Query("SELECT r FROM RelationshipType r WHERE r.statutSMS = 'READY' AND r.statutResidance <> 'F' AND r.libelleStatutResidance = :parametre")
     List<RelationshipType> findRelationshipTypesByStatutSMSAndLibelleStatutResidance(@Param("parametre") String parametre);
 
     
@@ -181,5 +203,26 @@ public interface  RelationshipTypeRepository extends JpaRepository<RelationshipT
     
     
     
- 
+    @Query("SELECT new com.cgpr.visitApp.dto.EventSMSDto(" +
+            "r.prisoner.id, r.prisoner.firstName, r.prisoner.lastName, " +
+            "r.relationShip, r.namePrison, r.numDetention, " +
+            "r.codeResidance, r.anneeResidance, r.libelleStatutResidance, " +
+            "r.eventDate, r.statutSMS, r.sentDate, " +
+            "r.visitor.firstName, r.visitor.lastName, r.visitor.phone , r.statutDLR , r.dlrDate) " +
+            "FROM RelationshipType r " +
+            "WHERE  r.prisoner.id = :prisonerId AND r.statutResidance = 'O' ")
+     List<EventSMSDto> findEntrantEventsByPrisonerId(@Param("prisonerId") String prisonerId); 
+//    r.libelleStatutResidance = 'Entrant' AND
+
+    
+    
+    
+    
+    @Query("SELECT new com.cgpr.visitApp.dto.RelationshipSalleAndTimeDTO(r.day, r.time, r.centre, r.salle) " +
+            "FROM RelationshipType r " +
+            "WHERE r.prisoner.id = :prisonerId " +
+            "AND r.statutResidance = 'O' " +
+            "AND r.id = (SELECT MAX(r2.id) FROM RelationshipType r2 WHERE r2.prisoner.id = :prisonerId AND r2.statutResidance = 'O')")
+    RelationshipSalleAndTimeDTO findLastActiveResidenceByPrisonerId(@Param("prisonerId") String string);
+  
 }

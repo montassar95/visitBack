@@ -9,24 +9,27 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cgpr.visitApp.dto.ApiResponseAmenPhotoDto;
 import com.cgpr.visitApp.dto.PrisonerDto;
 import com.cgpr.visitApp.dto.RelationshipTypeAmenDto;
 import com.cgpr.visitApp.dto.VisitorDto;
 import com.cgpr.visitApp.dto.amenDto.ApiResponseAmenVisitorDto;
 import com.cgpr.visitApp.model.Prisoner;
 import com.cgpr.visitApp.model.RelationshipType;
-import com.cgpr.visitApp.model.VisiteursTime;
+//import com.cgpr.visitApp.model.VisiteursTime;
 import com.cgpr.visitApp.model.Visitor;
 import com.cgpr.visitApp.repository.PrisonerPenalRepository;
 import com.cgpr.visitApp.repository.PrisonerRepository;
 import com.cgpr.visitApp.repository.RelationshipTypeRepository;
-import com.cgpr.visitApp.repository.VisiteursTimeRepository;
+//import com.cgpr.visitApp.repository.VisiteursTimeRepository;
 import com.cgpr.visitApp.repository.VisitorRepository;
 import com.cgpr.visitApp.services.RelationshipTypeService;
 import com.cgpr.visitApp.services.VisitorService;
@@ -39,7 +42,7 @@ import reactor.core.publisher.Mono;
  public class VisitorController {
 
 	private VisitorService visitorService;
-	private VisiteursTimeRepository visiteursTimeRepository;
+//	private VisiteursTimeRepository visiteursTimeRepository;
 	private RelationshipTypeService relationshipTypeService;
 	private PrisonerPenalRepository prisonerPenalRepository;
 	private RelationshipTypeRepository relationshipTypeRepository;
@@ -48,12 +51,12 @@ import reactor.core.publisher.Mono;
 	
 	
 	@Autowired
-	public VisitorController(VisitorService visitorService,VisiteursTimeRepository visiteursTimeRepository, RelationshipTypeRepository relationshipTypeRepository,
+	public VisitorController(VisitorService visitorService,  RelationshipTypeRepository relationshipTypeRepository,
 			RelationshipTypeService relationshipTypeService ,PrisonerPenalRepository prisonerPenalRepository , VisitorRepository visitorRepository,
 			PrisonerRepository prisonerRepository) { 
 
 		this.visitorService = visitorService;
-		this.visiteursTimeRepository=visiteursTimeRepository;
+//		this.visiteursTimeRepository=visiteursTimeRepository;
 		this.relationshipTypeService=relationshipTypeService;
 		this.prisonerPenalRepository=prisonerPenalRepository;
 		this.relationshipTypeRepository=relationshipTypeRepository;
@@ -118,7 +121,28 @@ import reactor.core.publisher.Mono;
 
 	
 	
- 
+	@GetMapping(path = APP_ROOT +"visit/trouverAmenPhoto/{parameter}")
+	public ResponseEntity<ApiResponseAmenPhotoDto> trouverAmenPhoto(@PathVariable String parameter) {
+		System.out.println(parameter);
+	    // Logger log = LoggerFactory.getLogger(getClass()); // Si tu veux utiliser SLF4J
+
+	    try {
+	        ApiResponseAmenPhotoDto response = visitorService
+	            .callAmenPhotoAPI(parameter.trim())
+	            .block(); // attention : bloquant !
+
+	        if (response == null) {
+	            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+	        }
+	        
+	        return ResponseEntity.ok(response);
+
+	    } catch (Exception e) {
+	        // log.error("Erreur lors de l'appel à AmenPhotoAPI", e);
+	        e.printStackTrace(); // à remplacer par du vrai logging en prod
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
 	
 //	@GetMapping(path = APP_ROOT + "visitors/amen", produces = MediaType.APPLICATION_JSON_VALUE)
 //	public List<RelationshipType> amen( ) {

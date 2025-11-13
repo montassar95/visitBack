@@ -27,6 +27,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import com.cgpr.visitApp.config.*;
+import com.cgpr.visitApp.dto.PrisonerDto;
 import com.cgpr.visitApp.dto.RelationshipTypeDto;
 import com.cgpr.visitApp.dto.VisitorDto;
 
@@ -382,7 +383,7 @@ public class PdfServiceImpl implements PdfService {
     }
 
 	@Override
-	public byte[] exportWithOutVisitPdf(List<RelationshipTypeDto> list, String prison, String title)
+	public byte[] exportWithOutVisitPdf(List<PrisonerDto> list, String prison, String title)
 			throws DocumentException, IOException, ArabicShapingException {
 		 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/uuuu mm:HH");
 	        LocalDateTime localDate = LocalDateTime.now();
@@ -515,7 +516,7 @@ public class PdfServiceImpl implements PdfService {
 	      
 	      
 	        int i=1;
-	        for (RelationshipTypeDto r : list) {
+	        for (PrisonerDto r : list) {
 	        	 
 	        	   p1 = new Phrase(r.getEventDate()  , boldfontLabelAmiri13);
 		            c1 = new PdfPCell(p1);

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.cgpr.visitApp.dto.DayDto;
+import com.cgpr.visitApp.dto.EventSMSDto;
 import com.cgpr.visitApp.dto.PrisonerDto;
 import com.cgpr.visitApp.dto.RelationshipTypeAmenDto;
 import com.cgpr.visitApp.dto.RelationshipTypeDto;
@@ -18,10 +19,20 @@ public interface  RelationshipTypeService {
 	List<RelationshipType>  save (RelationshipTypeDto relationshipTypeDto);
 	
 	RelationshipTypeDto findByPrisonerId(String idPrisoner);
+	RelationshipTypeDto findByPrisonerIdFromPenal(String idPrisoner);
 	
-	List<RelationshipTypeDto> findPrisonersEnteringByPeriodandLocation( String startDate,String endDate, String gouvernorat, String prison);
 	
-	List<RelationshipTypeDto> findPrisonersMutatingByPeriodandLocation( String startDate,String endDate, String gouvernorat, String prison);
+	List<PrisonerDto> findPrisonersEnteringByPeriodandLocation( String startDate,String endDate, String gouvernorat, String prison);
+	
+	List<PrisonerDto> findPrisonersMutatingByPeriodandLocation( String startDate,String endDate, String gouvernorat, String prison);
+	
+	
+	
+	List<PrisonerDto> findPrisonersMutatingSortantByPeriodandLocation( String startDate,String endDate, String gouvernorat, String prison);
+	
+	
+	
+	
 	
 	List<RelationshipTypeDto> findPrisonersLeavingByPeriodandLocation( String startDate,String endDate, String gouvernorat, String prison);
 	
@@ -29,10 +40,16 @@ public interface  RelationshipTypeService {
 //	List<RelationshipTypeDto> findPrisonersExistingByLocationWithOutVisit(  String gouvernorat, String prison);
 	
 	
-	List<RelationshipTypeDto> findPrisonersExistingByLocationWithOutVisit(  String gouvernorat, String prison);
+	List<PrisonerDto> findPrisonersExistingByLocationWithOutVisit(  String gouvernorat, String prison,String nom,String prenom, String nomPere );
+	
+	List<RelationshipTypeDto> findAllPrisonersExisting (  String gouvernorat, String prison,String nom,String prenom, String nomPere ,String idPrisoner , String numeroEcrou);
 	
 	
-	List<RelationshipTypeDto> findByTimeAndDayAndPrisonAndStatutO( String time,String day, String gouvernorat, String prison);
+	
+	List<RelationshipTypeDto> findAllPrisonersExistingFromPenal (  String gouvernorat, String prison,String nom,String prenom, String nomPere ,String idPrisoner , String numeroEcrou);
+	
+	
+	List<RelationshipTypeDto> findByTimeAndDayAndPrisonAndStatutO( String time,String day, String gouvernorat, String prison, String nom, String prenom, String nomPere,String idPrisoner, String numeroEcrou );
 	
 	List<RelationshipTypeDto> findByPrisonAndStatutOAndStatutSMSReady(   String gouvernorat, String prison);
 	
@@ -40,7 +57,7 @@ public interface  RelationshipTypeService {
 	
 	void updateRelationshipTypeStatutResidance();
 	
-	 List<List<String>> getCountMatrix(  String codeGouvernorat,  String codePrison) ;
+	 List<List<String>> getCountMatrix(  String codeGouvernorat,  String codePrison,  String centre,  String salle) ;
 	 List<DayDto>  getCountMatrixForDashboarding(  String codeGouvernorat, String codePrison);
 	 
 	 void updateStatutSMSToReady(String statut,List<RelationshipTypeDto> relationshipTypeDtoList );
@@ -58,5 +75,10 @@ public interface  RelationshipTypeService {
 	   
 	   List<RelationshipTypeAmenDto> findVisitByPrisonerId (String idPrisoner);
 //	 List<DayDto> getCountByDay(String codeGouvernorat, String codePrison);
+	   
+	   
+	   List<EventSMSDto> getEntrantEvents(String prisonerId);
+	   
+	   public List<PrisonerDto> findResidantPrisonersByLocation( String gouvernorat, String prison) ;
 	 
 }

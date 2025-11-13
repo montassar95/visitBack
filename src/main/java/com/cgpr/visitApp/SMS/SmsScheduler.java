@@ -32,8 +32,11 @@ public class SmsScheduler {
         this.relationshipTypeRepository = relationshipTypeRepository;
     }
 
-     @Scheduled(cron = "0 * * * * *") // Cette méthode sera exécutée chaque minute
-    public void envoyerSmsPlanifie() {
+      //@Scheduled(cron = "0 * * * * *") // Cette méthode sera exécutée chaque minute
+     //  @Scheduled(cron = "*/5 * * * * *") // toutes les 1 secondes
+       @Scheduled(cron = "0/30 * * * * *") //30 seconde
+
+     public void envoyerSmsPlanifie() {
         LocalDate currentDate = LocalDate.now();
         DayOfWeek currentDayOfWeek = currentDate.getDayOfWeek();
         LocalTime currentTime = LocalTime.now();
@@ -63,11 +66,11 @@ public class SmsScheduler {
     }
 
      
-     //pour chat GPT j'veux retourner   Flux<RelationshipType> + messageTiming
+     //je veux retourner   Flux<RelationshipType> + messageTiming
     private Flux<Tuple2<RelationshipType, MessageTiming>> getRelationshipTypeFlux(String typeOfMsg, DayOfWeek currentDayOfWeek, LocalTime currentTime) {
         MessageTiming messageTiming = messageTimingRepository.findByTypeOfMsgAndActivatedIsTrue(typeOfMsg);
         if (messageTiming != null && conditionsPourEnvoyerSms(messageTiming, currentDayOfWeek, currentTime)) {
-        	System.err.println("lancement de getRelationshipTypeFlux = "+typeOfMsg);
+//        	System.err.println("lancement de getRelationshipTypeFlux = "+typeOfMsg);
         	
         	Flux<RelationshipType> relationshipTypeFlux = Flux.fromIterable(relationshipTypeRepository.findRelationshipTypesByStatutSMSAndLibelleStatutResidance(typeOfMsg));
 
@@ -95,7 +98,7 @@ public class SmsScheduler {
         }
         
         
-        envoiSmsService.envoyerSms(from, "216"+to, text)
+        envoiSmsService.envoyerSms( "216"+to, text,relationshipType.getId()+"")
         .subscribe(envoiReussi -> {
             if (envoiReussi) {
             	relationshipType.setStatutSMS("SENT");
@@ -109,7 +112,7 @@ public class SmsScheduler {
     }
 
     private boolean conditionsPourEnvoyerSms(MessageTiming messageTiming, DayOfWeek currentDayOfWeek, LocalTime currentTime) {
-    	System.err.println("lancement de conditionsPourEnvoyerSms");
+//    	System.err.println("lancement de conditionsPourEnvoyerSms");
         if (messageTiming.isActivated()) {
             switch (currentDayOfWeek) {
                 case SUNDAY:

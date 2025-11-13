@@ -22,8 +22,11 @@ public class RelationshipTypeDto {
     private String lastName;
     
 	private String codeNationalite;
+	private String nationalite;
 	private String  etat;
 	private String  type;
+	private String  situation;
+	
 //    private String affairType;
     
     private String codeGouvernorat;
@@ -36,18 +39,71 @@ public class RelationshipTypeDto {
 	
 	
 	
-        private String day;
-	    private String time;
+         private String day;
+ 	    private String time;
+	private String centre;
+	private String salle;
 	    private String  statutSMS;
 	 
 		private String eventDate;
         private List<VisitorDto> visitorsDto;
     
-         private String room;
+        
     
          private String affaires;
     
-
+//         private String  dateDebutPunition;
+//     	private String  dateFinPunition;
+     	
+     	
+     	 private String room;
+     	 private String numeroPecule;
+     	  private String  anneePecule;
+     	  
+     	  
+     	private String soldeExistant;          // "45560"
+  	    private String identifiantRibPoste;      // "GG250120784853"
+  	    private String identifianttaxiphone;     // "2501207"
+   
+  	   //////////// start aprops affaire 
+  	  private String tnumseqaff;
+  	
+  	private String numAffaire;
+  	private String tribunal;
+  	private String dateJugement;
+  	
+  	private String situationPenal;
+  	private String contestation ;
+  	
+  	private String typeAffaire;
+  	private String accusation;
+  	
+  	
+  	private  String totaleJugement;
+  	private  String typeJugement;
+  	private  String dateDebutPunition;
+  	private  String dateFinPunition;
+  	
+  	 private int  totalCount;
+     //////////// end aprops affaire 
+  	 
+     // === Champs supplémentaires ajoutés depuis la requête 1  ===
+     private String birthDate;
+     private String motherName;
+     private String maternalGrandmotherName;
+     private String sex;
+     private String adresse;
+     private String partenaire;
+     private String nombreEnfant;
+     private String profession;
+     private String niveauCulturel;
+     
+     // === Champs supplémentaires ajoutés depuis la requête  pour liberation  ===
+     private String  dateLiberation ;
+     private String     motifLiberation ;
+ 	 
+ 	 
+     private String   StatutFermer;
     public static List<RelationshipType> toListEntity(RelationshipTypeDto relationshipTypeDto) {
         if (relationshipTypeDto == null) {
             throw new IllegalArgumentException("relationshipTypeDto ne peut pas être null");
@@ -74,6 +130,8 @@ public class RelationshipTypeDto {
                     .relationShip(visitorDto.getRelationship())
                     .day(relationshipTypeDto.getDay())
                     .time(relationshipTypeDto.getTime())
+                    .centre(relationshipTypeDto.getCentre())
+                    .salle(relationshipTypeDto.getSalle())
                     .statutSMS(relationshipTypeDto.getStatutSMS())
                     .eventDate(relationshipTypeDto.getEventDate())
                     .codeGouvernorat(relationshipTypeDto.getCodeGouvernorat())  
@@ -112,6 +170,8 @@ public class RelationshipTypeDto {
          	   
                 .day(firstRelationshipType.getDay())
                 .time(firstRelationshipType.getTime())
+                .centre(firstRelationshipType.getCentre())
+                .salle(firstRelationshipType.getSalle())
                 .statutSMS(firstRelationshipType.getStatutSMS())
                 .eventDate(firstRelationshipType.getEventDate())
                 .codeGouvernorat(firstRelationshipType.getCodeGouvernorat())  
@@ -176,7 +236,10 @@ public class RelationshipTypeDto {
     		    .grandFatherName(prisonerDto.getGrandFatherName())
     		    .lastName(prisonerDto.getLastName())
     		    .codeNationalite(prisonerDto.getCodeNationalite())
+    		    .nationalite(prisonerDto.getNationalite())
     		    .etat(prisonerDto.getEtat())
+    		    .situation(prisonerDto.getSituation())
+    		    
     		    .visitorsDto(listVisitors)
     		     .eventDate(prisonerDto.getEventDate())
     		    .codeGouvernorat(prisonerDto.getCodeGouvernorat())  
@@ -186,8 +249,23 @@ public class RelationshipTypeDto {
     			.anneeResidance(prisonerDto.getAnneeResidance())
     			 .statutResidance(prisonerDto.getStatutResidance())
     			 .numDetention(prisonerDto.getNumDetention())
-    		    
-    		  
+    			// Vérification des dates avant de les manipuler
+    			    .dateDebutPunition(prisonerDto.getDateDebutPunition() != null ? prisonerDto.getDateDebutPunition().substring(0, 10) : null)
+    			    .dateFinPunition(prisonerDto.getDateFinPunition() != null ? prisonerDto.getDateFinPunition().substring(0, 10) : null)
+    			    // === Champs supplémentaires ajoutés depuis la requête ===
+    			     .birthDate(prisonerDto.getBirthDate())
+    			     .motherName(prisonerDto.getMotherName())
+    			     .maternalGrandmotherName(prisonerDto.getMaternalGrandmotherName())
+    			     .sex(prisonerDto.getSex())
+    			     .adresse(prisonerDto.getAdresse())
+    			     .partenaire(prisonerDto.getPartenaire())
+    			      .nombreEnfant(prisonerDto.getNombreEnfant())
+    			     .profession(prisonerDto.getProfession())
+    			    .niveauCulturel(prisonerDto.getNiveauCulturel())
+    			    
+    			    .dateLiberation(prisonerDto.getDateLiberation())
+    			    .motifLiberation(prisonerDto.getMotifLiberation())
+    			    .StatutFermer(prisonerDto.getStatutFermer())
     		    .build();
         return relationshipTypeDto;
 	}
@@ -229,11 +307,16 @@ public class RelationshipTypeDto {
 	@Override
 	public String toString() {
 		return "RelationshipTypeDto [idPrisoner=" + idPrisoner + ", firstName=" + firstName + ", fatherName="
-				+ fatherName + ", grandFatherName=" + grandFatherName + ", lastName=" + lastName + ", codeGouvernorat="
-				+ codeGouvernorat + ", codePrison=" + codePrison + ", namePrison=" + namePrison + ", codeResidance="
-				+ codeResidance + ", anneeResidance=" + anneeResidance + ", statutResidance=" + statutResidance
-				+ ", visitorsDto=" + visitorsDto + "]";
+				+ fatherName + ", grandFatherName=" + grandFatherName + ", lastName=" + lastName + ", codeNationalite="
+				+ codeNationalite + ", etat=" + etat + ", type=" + type + ", codeGouvernorat=" + codeGouvernorat
+				+ ", codePrison=" + codePrison + ", namePrison=" + namePrison + ", codeResidance=" + codeResidance
+				+ ", anneeResidance=" + anneeResidance + ", statutResidance=" + statutResidance + ", numDetention="
+				+ numDetention + ", day=" + day + ", time=" + time + ", centre=" + centre + ", salle=" + salle
+				+ ", statutSMS=" + statutSMS + ", eventDate=" + eventDate + ", visitorsDto=" + visitorsDto + ", room="
+				+ room + ", affaires=" + affaires + ", dateDebutPunition=" + dateDebutPunition + ", dateFinPunition="
+				+ dateFinPunition + "]";
 	}
+	
 }
 
 //if (relationshipType.getVisitor().getLastName() != null) {

@@ -8,6 +8,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.cgpr.visitApp.exception.EntityNotFoundException;
+import com.cgpr.visitApp.exception.ErrorCodes;
 import com.cgpr.visitApp.exception.InvalidEntityException;
 
 @RestControllerAdvice
@@ -36,4 +37,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(errorDto, badRequest);
 
 	}
+	
+	@ExceptionHandler(HospitalisationException.class)
+	public ResponseEntity<ErrorDto> handleHospitalisation(HospitalisationException ex, WebRequest request) {
+	    ErrorDto dto = ErrorDto.builder()
+	        .code(ex.getErrorCode())
+	        .httpCode(HttpStatus.BAD_REQUEST.value())
+	        .message(ex.getMessage())
+	        .errors(ex.getErrors())
+	        .build();
+	    return new ResponseEntity<>(dto, HttpStatus.BAD_REQUEST);
+	}
+
+
 }

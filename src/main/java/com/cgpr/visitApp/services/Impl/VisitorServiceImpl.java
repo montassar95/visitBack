@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 //import org.springframework.security.crypto.password.NoOpPasswordEncoder; // Si vous utilisez NoOpPasswordEncoder
 import org.springframework.http.MediaType;
 
+import com.cgpr.visitApp.dto.ApiResponseAmenPhotoDto;
 import com.cgpr.visitApp.dto.PrisonDto;
 import com.cgpr.visitApp.dto.PrisonerDto;
 import com.cgpr.visitApp.dto.amenDto.ApiResponseAmenRoomDto;
@@ -45,11 +46,11 @@ public class VisitorServiceImpl implements VisitorService {
 	 
 	@Override
 	public Mono<ApiResponseAmenVisitorDto> callAmenVisitorAPI(String parameter) {
-        String apiUrl = "http://10.10.81.17:8181/AppWebServiceBornSiege/api/cgpr/visiteur/IdentiteAmenVisiteur/IdentiteAmenAllByGouvPrCodres/" + parameter;
+        String apiUrl = "http://192.168.100.2:8181/AppWebServiceCgprSiege/api/cgpr/visiteur/IdentiteAmenVisiteur/IdentiteAmenAllByGouvPrCodres/" + parameter;
 
         WebClient client = WebClient.builder()
                 .baseUrl(apiUrl)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + getBasicAuthCredentials())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + getBasicAuthCredentialsµForVisiteur())
                 .build();
 
         return client.get()
@@ -66,11 +67,11 @@ public class VisitorServiceImpl implements VisitorService {
 
 	@Override
 	public Mono<ApiResponseAmenRoomDto> callAmenRoomAPI(String parameter) {
-		  String apiUrl = "http://10.10.81.17:8181/AppWebServiceBornSiege/api/cgpr/visiteur/IdentiteAmenVisiteur/IdentiteAmenAllByGouvPrCodresPavChambre/" + parameter;
-
+		  String apiUrl = "http://192.168.100.2:8181/AppWebServiceCgprSiege/api/cgpr/visiteur/IdentiteAmenVisiteur/IdentiteAmenAllByGouvPrCodresPavChambre/" + parameter;
+//System.err.println(apiUrl);
 	        WebClient client = WebClient.builder()
 	                .baseUrl(apiUrl)
-	                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + getBasicAuthCredentials())
+	                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + getBasicAuthCredentialsµForVisiteur())
 	                .build();
 
 	        return client.get()
@@ -83,11 +84,41 @@ public class VisitorServiceImpl implements VisitorService {
 	                });
 	}
 	
-	   private String getBasicAuthCredentials() {
+	   private String getBasicAuthCredentialsµForVisiteur() {
 	        String username = "visiteur";
 	        String password = "Visireur#CgpR";
 	        String credentials = username + ":" + password;
 	        String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 	        return base64Credentials;
 	    }
+	   
+	   @Override
+	   public Mono<ApiResponseAmenPhotoDto> callAmenPhotoAPI(String parameter) {
+	        String apiUrl = "http://192.168.100.2:8181/AppWebServiceCgprSiege/api/cgpr/photo/IdentiteAmenPhoto/IdentiteAmenImgByGouvPrAnneeMoisJourCodres/" + parameter;
+
+	        WebClient client = WebClient.builder()
+	                .baseUrl(apiUrl)
+	                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + getBasicAuthCredentialsForPhoto())
+	                .build();
+
+	        return client.get()
+	        	    .accept(MediaType.APPLICATION_JSON)
+	        	    .retrieve()
+	        	    .bodyToMono(ApiResponseAmenPhotoDto.class)
+	        	    .doOnError(error -> {
+	        	        throw new RuntimeException("Erreur lors de l'appel à l'API ApiResponseAmenPhotoDto : " + error.getMessage());
+	        	    });
+	    } 
+
+	 
+
+	 
+		
+		   private String getBasicAuthCredentialsForPhoto() {
+		        String username = "photo";
+		        String password = "photoAxYPhoto2024";
+		        String credentials = username + ":" + password;
+		        String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes());
+		        return base64Credentials;
+		    }
 }

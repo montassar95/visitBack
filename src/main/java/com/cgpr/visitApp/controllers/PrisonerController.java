@@ -32,6 +32,16 @@ public class PrisonerController {
 		this.prisonerService = prisonerService;
 	}
 
+	
+	@GetMapping(path =  "/test", produces = MediaType.APPLICATION_JSON_VALUE)
+ 	public String test() {
+		 System.exit(0);
+		return "";
+
+	}
+	
+	
+	
 	@PostMapping(path = APP_ROOT
 			+ "prisoners/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
  

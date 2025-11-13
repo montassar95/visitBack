@@ -24,7 +24,7 @@ import lombok.ToString;
 public class Visitor{
 	      @Id
  	 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE_VISITOR")
-//	      private Long id ;
+ 
 	    private Long  idVisitor;
 	    private String firstName;
 	    private String fatherName;
